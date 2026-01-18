@@ -1,0 +1,179 @@
+CS2030 13 Jan 2025
+Use jshell to test constructs
+
+
+
+Imperative programming
+
+- Control flow statement (an if-loop and a for-loop are both a STATEMENT) to make changes to state. 
+
+- Assignment (expression) to change state.
+
+- Expression evaluates to a value '==>'
+
+- Switch cases - table lookup
+
+- first order; how to do the task
+
+- functions have fixed name and is called with arguments
+
+- takes in values as input, returns values as output
+
+
+Streams in a declarative style
+
+- Effect-free functions; no side-effect
+
+- higher order operations like map, reduce
+
+- what to do
+
+- functions can be expressed without a name (look at what's within reduce lol - a lambda expression is a function expression that evaluates to a value)
+
+- reduce() is a function and it took in another function: (x,y) -> x + y and a value: (0.0). IT CAN EVEN RETURN A FUNCTION :)
+
+
+- 'final', static modifiers on global variables to prevent state changes, but NO variables is the best.
+
+- Use of parameters in expressions, local variables??(constants), new (constructors) instantiated object references
+
+- Conditional expression         method(input) ? ___ : ___       (ternary operator, evaluates to left or right of the colon)
+
+- Streams are loops that are abstracted away from you (INTERNAL ITERATION is defined declaratively using Java stream)
+
+- will lead to an expression or evaluate to a generator 
+
+
+	IntStream.range(2, n).filter(x -> n % x == 0).toArray().count() == 0	//return values that match (x is a divisor of n), return true if there are none
+
+	boolean isPrime(int n) {
+		return n > 1 &&
+			IntStream.range(2, n).noneMatch(x -> n % x == 0)	//return true if is a prime
+	}
+
+Every problem can be formulated as a pipeline. 
+
+Does not involve states, assignments.
+Streams do the incrementing...only tell stream what to check, he will do the check.
+
+PRIMITIVE(Single data values, singleton)
+
+vs REFERENCE TYPE (composite data types)
+	stuff you create yourself e.g. point in xy space is a type of a group of 2 floating point values (point class), array
+	primitives can be boxed/unboxed by their wrapper types e.g Integer, Double, Boolean 
+
+Instead of Array... (we want to avoid changes to the values in composite data types) 
+...use List (ArrayList can .add(), NOT ALLOWED to use ArrayList in CS2030)
+
+	Java's List represents an abstraction of a read-only array
+	List is a generic type - container type  of a specific reference type, e.g. List<Double> for a list of double values
+	This construct doesnt allow you to mutate/change the values in it.
+
+		List<Double> list = List.of(1.0, 2.0, 3.0, 4.0)		//initialise a List
+
+In CS2030, whatever you generate has to be immutable. 
+
+		list.stream().map(x -> x * 2).toList()			//streamify a list
+
+__________________________________________________________________________________________________________________________________
+Reduction operations Link icon
+A reduction operation (also called a fold) takes a sequence of input elements and combines them into a single summary result by repeated application of a combining operation, such as finding the sum or maximum of a set of numbers, or accumulating elements into a list. The streams classes have multiple forms of general reduction operations, called reduce() and collect(), as well as multiple specialized reduction forms such as sum(), max(), or count().
+Of course, such operations can be readily implemented as simple sequential loops, as in:
+
+
+    int sum = 0;
+    for (int x : numbers) {
+       sum += x;
+    }
+ 
+However, there are good reasons to prefer a reduce operation over a mutative accumulation such as the above. Not only is a reduction "more abstract" -- it operates on the stream as a whole rather than individual elements -- but a properly constructed reduce operation is inherently parallelizable, so long as the function(s) used to process the elements are associative and stateless. For example, given a stream of numbers for which we want to find the sum, we can write:
+
+    int sum = numbers.stream().reduce(0, (x,y) -> x+y)
+__________________________________________________________________________________________________________________________________
+	double mean(List <Double> list) {
+		return list.stream().reduce(0.0, (x,y) -> x+y)
+	}
+
+
+
+20 Jan 2025
+
+Ways to create a stream - refer to Java's IntStream API "static (factory) methods" to start you off on a stream (LAZY EVALUATION - does not perform any operations on stream's elements until a terminal operation is called)
+e.g. 	rangeClosed(),  only takes in start and end numbers
+	
+	iterate will start iterating from a seed value (starting element), so provide a starting element
+	what is the next number after your starting element? it will be governed by the function you put after the second comma but more expressive than rangeClosed (you can customise the step)
+	just like when you write a for loop, need to know where to end. The function after the first comma is to know when you should not generate further.
+	There is another version of iterate that has only two arguments (don't have 'when to end') , infinite stream
+	
+	generate,takes in SUPPLIER, infinite stream, 
+
+<FORMS OF LAMBDAS>
+intermediate operations - specifies some task to perform on stream elements (LAZY EVALUATION only produces a generator. ***Doesn't get evaluated until soemone down the stream wants a value)
+e.g. 	limit	- useful for infinite streams
+	
+	filter 	- whatever doesnt match the function (outcome of the function is true or false) gets skipped (not continue), taking in the next element from previous stream
+		- not about blocking out, but letting through elements that are true. We only want FEWER ELEMENTS..
+		- to TEST A PREDICATE (that produces boolean output true/false) to obtain only those that are true.
+
+	map 	- can map an anything to anything (boolean, etc.) in generic streams (IntStream is a lot more strict - the input is an integer, and the resultant must express back to an integer)
+		- for an element, we want to make it another element, we want the SAME NUMBER OF ELEMENTS.
+		- to APPLY A FUNCTION on a stream element of type T to produce an element of a possibly different type R
+
+	flatMap	- if u have n elements and you want to transform into another stream of more than n elements. Turning a stream of streams into a single stream with all elements
+
+to find ways to terminate the stream, go to the API all methods tab  (EAGER EVLAUATION -  performs the requested operation as soon as itt produce a generator called)
+e.g. 	sum 
+
+	reduce	- takes in a BINARY FUNCTION (a lambda that has 2 arguments)
+
+	noneMatch
+	
+	boolean isPrime(int n) {
+		return n > 1 && IntStream.range(2,n).noneMatch(x -> n % x == 0); 
+	}	
+
+
+	forEach	- takes in a CONSUMER. Takes in something, gives out nothing!
+		- the only consumer we will use is for printing
+
+		IntStream.range(0,10).filter(x -> isPrime(x)).forEach(x -> System.out.println(x))
+	peek 	- for debugging. also prints
+
+	mapToObj- change an output to a certain form, outputs an intstream but is 
+		- a way to go from primitive streams to generic stream Stream<Boolean> angular brackets
+
+	boxed() also turns it into a generic stream(lol ok?)
+		- generic streams can use .toList() to print out as a list of ints, strings... or whatever the stream is made of.
+CONSUMER, SUPPLIER and COMPARATOR
+
+PIPELINE
+
+Data source (return(start) a new stream) -> intermediate operations (return a new stream) 
+-> terminal operation (depending on the nature of the operation, you might get a value or not) / reduction(aggregate all the transformed values)
+
+stream elements are used once only.
+
+
+LAMBDA Syntax = 
+
+
+
+
+Evaluation starts from the terminal. Lazily, and upstream and downstream element by element
+
+
+/open eval.jsh
+/list
+/list 14
+
+All stream operations (except forEach) represents a function.
+A function is a mapping from a set of inputs X (domain) to a set of outputs (range) within a co-domain Y, f: X -> Y
+
+	- every input in the domain maps to exactly one output
+	- multiple inputs can map to the same output
+	- Not all values in the co-domain are mapped
+
+Basically, every input must have only 1 output
+
+OptionalInt Optionals helps us check for us (if-else) - findFirst().orElse(-1i). it is a type that encompasses both empty value and the primitive 

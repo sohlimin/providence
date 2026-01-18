@@ -1,0 +1,39 @@
+hikingtrail old code
+                //discovery: you never need to check is the north and west are traversable
+                //because if you got there by moving south or eastwards, you literally came from there                
+boolean traversableEast = false;
+
+                hike[0][0] = 1;
+                int i = 0;
+                do {
+                        int tmpi = i;
+
+                        if (Math.abs(map[i][j] - map[i + 1][j]) <= 2) {
+                                hike[i + 1][j] = 1;
+                                i++;
+                        }
+
+
+
+                } while (traversable)
+
+
+                do {
+                        if (Math.abs(map[i][j] - map[i][j + 1]) <= 2) {
+                                hike[i][j + 1] = 1;
+                                j++;
+                        }
+                } while (traversableSouth)
+
+                do{
+                        if (j > 0) {
+                                if (Math.abs(map[i][j] - map[i][j - 1]) <= 2) {
+                                        hike[i][j - 1] = 1;
+                                        if (j - 1 == tmpj)
+                                        j--;
+                                }
+                        if (i > 0) {
+                                if (Math.abs(map[i][j] - map[i - 1][j]) <= 2) {
+                                        hike[i][j - 1] = 1;
+                                }
+                        }
